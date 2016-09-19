@@ -9,7 +9,7 @@ public class Account {
     private double balance;
     private int accountNum;
     private double interestRate;
-    private static int accountNumCounter = 1;
+    private static int accountNumCounter;
     private int customerID;
 
     public enum AccountType{
@@ -20,9 +20,10 @@ public class Account {
         this.customerID = customerID;
         this.type = type;
         this.balance = balance;
-        this.setInterestRate(type);
-        this.accountNum = accountNumCounter;
+        this.setInterestRate();
         accountNumCounter++;
+        this.accountNum = accountNumCounter;
+
 
     }
 
@@ -32,7 +33,7 @@ public class Account {
         return this.accountNum;
     }
 
-    public void setInterestRate(AccountType type){
+    public void setInterestRate(){
         switch(type){
             case CHECKING:
                 this.interestRate = 0;
@@ -44,6 +45,17 @@ public class Account {
                 this.interestRate = .05;
         }
     }
+
+    public double decreaseBalance(double amount){
+        this.balance -= amount;
+        return balance;
+    }
+    public double increaseBalance(double amount){
+        this.balance += amount;
+        return balance;
+    }
+
+
 
     public double getCustomerID(){
         return customerID;

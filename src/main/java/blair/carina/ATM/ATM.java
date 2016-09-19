@@ -1,10 +1,11 @@
 package blair.carina.ATM;
 
+import java.util.ArrayList;
+
 /**
  * Created by carinablair on 9/16/16.
  */
 public class ATM {
-    private Transactions transactions;
     private Account account;
     private Customer customer;
     private Display display;
@@ -14,6 +15,7 @@ public class ATM {
     private TransactionManager transactionManager;
     private CustomerManager customerManager;
     private AccountManager accountManager;
+    private ArrayList<Account> customerAccounts;
 
     public ATM(){
         this.running = true;
@@ -36,8 +38,7 @@ public class ATM {
                     int loginPin = userInputHandler.getUserInt();
                     if(verifyLoginInfo(loginCustomerID, loginPin)) {
                         currentCustomerID = loginCustomerID;
-                        display.printTransactionMenu();
-
+                        this.accessCustomerAccount();
                     }
                     else{
                         display.errorMessage();
@@ -81,14 +82,14 @@ public class ATM {
                 account = new Account(type, newAccountBalance, customer.getCustomerID());
                 accountManager.addAccount(account);
                 display.printConfirmAccountCreation();
-                System.out.printf("Savings Account%nBalance: %d%nInterest Rate: %.2f%n",newAccountBalance, account.getInterestRate());
+                System.out.printf("Savings Account%nBalance: %.2f%nInterest Rate: %.2f%n",newAccountBalance, account.getInterestRate());
                 this.startATM();
                 break;
             case INVESTMENT:
                 account = new Account(type, newAccountBalance, customer.getCustomerID());
                 accountManager.addAccount(account);
                 display.printConfirmAccountCreation();
-                System.out.printf("Investment Account%nBalance: %d%nInterest Rate: %.2f%n",newAccountBalance,account.getInterestRate());
+                System.out.printf("Investment Account%nBalance: %.2f%nInterest Rate: %.2f%n",newAccountBalance,account.getInterestRate());
                 this.startATM();
                 break;
             default:
@@ -100,87 +101,178 @@ public class ATM {
 
     }
 
-    public void accessServices(){
-
+    public void accessTransactions(){
         int option = userInputHandler.getUserInt();
         double amount;
         switch(option){
             case 1:
                 System.out.println("Enter Amount: ");
-                amount = userInputHandler.getUserInt();
-                account = accountManager.getAccount(currentCustomerID);
-                this.withdrawal(amount, currentCustomerID, account.getAccountNumber());
-                transactionManager.addTransaction(Transactions.TranType.WITHDRAWAL,currentCustomerID,account.getAccountNumber(),amount);
+                amount = userInputHandler.getUserDouble();
+                this.withdrawal(amount);
+                System.out.println("Your new balance: " + account.getBalance());
+                this.accessTransactions();
                 break;
             case 2:
                 System.out.println("Enter Amount: ");
-                amount = userInputHandler.getUserInt();
-                account = accountManager.getAccount(currentCustomerID);
-                this.deposit(amount, currentCustomerID, account.getAccountNumber());
-                transactionManager.addTransaction(Transactions.TranType.DEPOSIT,currentCustomerID,account.getAccountNumber(),amount);
+                amount = userInputHandler.getUserDouble();
+                this.deposit(amount);
+                System.out.println("Your new balance: " + account.getBalance());
+                this.accessTransactions();
                 break;
             case 3:
-                System.out.println("Enter Amount: ");
-                amount = userInputHandler.getUserInt();
-                System.out.println("Enter ");
-                account = accountManager.getAccount(currentCustomerID);
-                this.withdrawal(amount, currentCustomerID, account.getAccountNumber());
+                if(customerAccounts.size() == 1){
+                    display.errorMessage();
+                    System.out.println("You only have one account. Would you like to open a new account?");
+                    String choice = userInputHandler.getUserString();
+                    if(choice == "yes"){
+                        display.printAccountTypes();
+                        this.accountTypeOptions();
+                    }
+                    else{
+                        this.accessTransactions();
+                    }
+                }
+                else {
+                    int toAccountNum=0;
+                    System.out.println("Enter Amount: ");
+                    amount = userInputHandler.getUserDouble();
+                    System.out.println("Enter Destination Account: ");
+                    String type = userInputHandler.getUserString();
+                    Account.AccountType accountType = Account.AccountType.valueOf(type.toUpperCase());
+                    Account destAccount = account;
+                    for(Account a: customerAccounts){
+                        if(a.getType() == accountType){
+                            toAccountNum = a.getAccountNumber();
+                            destAccount=a;
+                            break;
+                        }
+                        else{
+                            display.errorMessage();
+                            this.accessTransactions();
+                        }
+                    }
+                    this.transfer(amount,destAccount,toAccountNum);
+                    this.accessTransactions();
+                }
                 break;
+            case 4:
+                double balance = account.getBalance();
+                System.out.printf("You're Balance is: %.2f",balance);
+                this.accessTransactions();
+                break;
+            case 5:
+                display.printAccountTypes();
+                customer = customerManager.getCustomer(currentCustomerID);
+                this.accountTypeOptions();
+                break;
+            case 6:
+                boolean checkBalance = this.isAccountBalanceZero(account.getAccountNumber());
+                if(checkBalance){
+                    this.closeAccount();
+                }
+                else{
+                    System.out.println("You're account must have $0.00 balance.");
+
+                }
+                this.startATM();
+                break;
+            case 7:
+                this.startATM();
+                break;
+            default:
+                display.errorMessage();
+                this.accessTransactions();
 
         }
-
-    }
-
-    public void withdrawal(double amount, int customerID, int accountNumber){
-
-    }
-
-    public void deposit(double amount, int customerID, int accountNumber){
-
-    }
-
-    public void transfer(double amount, int customerID, int toAccountNumber, int fromAccountNumber){
 
     }
 
     public void accessCustomerAccount(){
-
-
-
+        customerAccounts = accountManager.getAccount(currentCustomerID);
+        switch(customerAccounts.size()){
+            case 1:
+                display.printTransactionMenu();
+                this.accessTransactions();
+                break;
+            case 2:
+                String accountType1 = (customerAccounts.get(0).getType()).toString();
+                String accountType2 = (customerAccounts.get(1).getType()).toString();
+                display.printAccountMenu();
+                System.out.printf("Choose Account: %n%s%n%s%n",accountType1,accountType2);
+                String option = userInputHandler.getUserString();
+                if(option == accountType1){
+                    account = customerAccounts.get(0);
+                }
+                else{
+                    account =customerAccounts.get(1);
+                }
+                display.printTransactionMenu();
+                this.accessTransactions();
+                break;
+            case 3:
+                String accountTypeFirst = (customerAccounts.get(0).getType()).toString();
+                String accountTypeSecond = (customerAccounts.get(1).getType()).toString();
+                String accountTypeThird = (customerAccounts.get(2).getType()).toString();
+                display.printAccountMenu();
+                System.out.printf("Choose Account: %n%s%n%s%n",accountTypeFirst,accountTypeSecond,accountTypeThird);
+                String choice = userInputHandler.getUserString();
+                if(choice == accountTypeFirst){
+                    account = customerAccounts.get(0);
+                }
+                else if(choice == accountTypeSecond){
+                    account =customerAccounts.get(1);
+                }
+                else{
+                    account =customerAccounts.get(2);
+                }
+                display.printTransactionMenu();
+                this.accessTransactions();
+                break;
+        }
 
 
     }
 
-    public void logout(){
-        display.printWelcomeScreen();
+    public void withdrawal(double amount){
+        account.decreaseBalance(amount);
+        transactionManager.addTransaction(Transactions.TranType.WITHDRAWAL,currentCustomerID,account.getAccountNumber(),amount);
+    }
+
+    public void deposit(double amount){
+        account.increaseBalance(amount);
+        transactionManager.addTransaction(Transactions.TranType.DEPOSIT,currentCustomerID,account.getAccountNumber(),amount);
+    }
+
+    public void transfer(double amount,Account destAccount, int toAccountNum){
+        account.decreaseBalance(amount);
+        destAccount.increaseBalance(amount);
+        transactionManager.addTransaction(Transactions.TranType.TRANSFER,currentCustomerID,toAccountNum,account.getAccountNumber(),amount);
     }
 
     public boolean verifyLoginInfo(int customerID, int PIN){
-        int checkCustomerID = customerManager.getCustomer(customerID).getCustomerID();
-        int checkPIN = customerManager.getCustomer(customerID).getPIN();
-
-        if(customerID==checkCustomerID){
-            if(PIN==checkPIN){
-                return true;
-            }
-            else{
-                return false;
-            }
+        if(customerManager.getCustomer(customerID).getCustomerID() == customerID && customerManager.getCustomer(customerID).getPIN() == PIN){
+           return true;
         }
         return false;
     }
 
-    public void createAccount(int customerID, int accountNum){
-
-    }
-
-    public boolean isAccountBalanceZero(int customerID, int accountNum){
-        boolean response = false;
-        return response;
+    public boolean isAccountBalanceZero(int accountNum){
+        for(Account a: customerAccounts){
+            if(a.getAccountNumber()==accountNum){
+                if(a.getBalance() == 0){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+        return false;
 
     }
 
     public void closeAccount(){
+
 
     }
 

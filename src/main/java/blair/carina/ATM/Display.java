@@ -25,7 +25,7 @@ public class Display {
 
     public void printLogin(){
         System.out.println("||||||||||||||||||||||||||||||");
-        System.out.printf("|||      CustomerID:        |||%n|||           PIN:           |||%n");
+        System.out.printf("|||      CustomerID:       |||%n|||           PIN:         |||%n");
         System.out.println("||||||||||||||||||||||||||||||");
 
     }
@@ -42,11 +42,18 @@ public class Display {
         System.out.println("Congratulations! You have created a new account. Your account information is below");
     }
 
+    public void printConfirmAccountClosed(){
+        System.out.println("Your account has been closed.");
+    }
+
     public void errorMessage(){
         System.out.println("Invalid Input");
     }
 
-    public void printReturningCustomerMenu(){
+    public void printAccountMenu(){
+        System.out.println("////////////////////////////////////");
+        System.out.println("///            Accounts          ///");
+        System.out.println("////////////////////////////////////");
 
     }
 
@@ -54,7 +61,7 @@ public class Display {
         System.out.println("////////////////////////////////////");
         System.out.println("///         Transactions         ///");
         System.out.println("////////////////////////////////////\n");
-        System.out.printf("1. Withdrawal%n2. Deposit%n3. Transfer%n4. New Account%n5. Close Account%n6. Logout%n%n");
+        System.out.printf("1. Withdrawal%n2. Deposit%n3. Transfer%n4. Get Balance%n5. Add Account%n6. Close Account%n7. Logout%n%n");
 
     }
 }

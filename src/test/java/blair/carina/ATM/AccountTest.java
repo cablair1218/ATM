@@ -11,11 +11,11 @@ public class AccountTest {
     Account account;
 
     @Before
-    public void initialize(){account = new Account(Account.AccountType.CHECKING,100.00,123);}
+    public void initialize(){account = new Account(Account.AccountType.SAVINGS,100.00,123);}
 
     @Test
     public void getType(){
-        Assert.assertEquals("This should return Checking", Account.AccountType.CHECKING,account.getType());
+        Assert.assertEquals("This should return Checking", Account.AccountType.SAVINGS,account.getType());
     }
     @Test
     public void getAccountNumber(){
@@ -23,8 +23,7 @@ public class AccountTest {
     }
     @Test
     public void getInterestRate(){
-        account.setInterestRate(Account.AccountType.CHECKING);
-        Assert.assertEquals(0,account.getInterestRate(),0);
+        Assert.assertEquals(0.01,account.getInterestRate(),0);
     }
     @Test
     public void getBalance(){

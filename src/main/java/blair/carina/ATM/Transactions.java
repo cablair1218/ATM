@@ -24,19 +24,6 @@ public class Transactions {
 
     }
 
-    public int getFromAccountNumber(){
-        return fromAccountNumber;
 
-    }
 
-    public int getToAccountNumber(){
-        return toAccountNumber;
-
-    }
-
-    public double getAmount(){ return amount;}
-
-    public TranType getTransactionType(){ return transactionType;}
-
-    public int getCustomerID(){ return customerID; }
 }
