@@ -49,9 +49,10 @@ public class ATM {
                     display.printNewCustomerMenu();
                     String newName = userInputHandler.getUserString();
                     int newPIN = userInputHandler.getUserInt();
-                    customer = new Customer(newName,newPIN);
-                    customerManager.addCustomer(newName,newPIN);
-                    System.out.printf("Your customer ID is %d. You will need this every time you visit the ATM.%n", customer.getCustomerID());
+                    this.customer = new Customer(newName,newPIN);
+                    this.customerManager.addCustomer(this.customer);
+                    System.out.printf("Your customer ID is %d. You will need this every time you visit the ATM.%n", this.customer.getCustomerID());
+                    this.currentCustomerID = customer.getCustomerID();
                     display.printAccountTypes();
                     this.accountTypeOptions();
                     break;
@@ -72,21 +73,21 @@ public class ATM {
         double newAccountBalance = userInputHandler.getUserDouble();
         switch (type) {
             case CHECKING:
-                account = new Account(type, newAccountBalance, customer.getCustomerID());
+                account = new Account(type, newAccountBalance, currentCustomerID);
                 accountManager.addAccount(account);
                 display.printConfirmAccountCreation();
                 System.out.printf("Checking Account%nBalance: %.2f%n",newAccountBalance);
                 this.startATM();
                 break;
             case SAVINGS:
-                account = new Account(type, newAccountBalance, customer.getCustomerID());
+                account = new Account(type, newAccountBalance, currentCustomerID);
                 accountManager.addAccount(account);
                 display.printConfirmAccountCreation();
                 System.out.printf("Savings Account%nBalance: %.2f%nInterest Rate: %.2f%n",newAccountBalance, account.getInterestRate());
                 this.startATM();
                 break;
             case INVESTMENT:
-                account = new Account(type, newAccountBalance, customer.getCustomerID());
+                account = new Account(type, newAccountBalance, currentCustomerID);
                 accountManager.addAccount(account);
                 display.printConfirmAccountCreation();
                 System.out.printf("Investment Account%nBalance: %.2f%nInterest Rate: %.2f%n",newAccountBalance,account.getInterestRate());
@@ -250,8 +251,10 @@ public class ATM {
     }
 
     public boolean verifyLoginInfo(int customerID, int PIN){
-        if(customerManager.getCustomer(customerID).getCustomerID() == customerID && customerManager.getCustomer(customerID).getPIN() == PIN){
-           return true;
+        if(customerManager.getCustomer(customerID) != null) {
+            if (customerManager.getCustomer(customerID).getCustomerID() == customerID && customerManager.getCustomer(customerID).getPIN() == PIN) {
+                return true;
+            }
         }
         return false;
     }

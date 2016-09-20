@@ -8,8 +8,7 @@ import java.util.ArrayList;
 public class CustomerManager {
     private ArrayList<Customer> customers = new ArrayList();
 
-    public void addCustomer(String name, int PIN){
-        Customer customer = new Customer(name, PIN);
+    public void addCustomer(Customer customer){
 
         customers.add(customer);
     }

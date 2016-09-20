@@ -9,7 +9,7 @@ public class Account {
     private double balance;
     private int accountNum;
     private double interestRate;
-    private static int accountNumCounter;
+    private static int accountNumCounter = 1;
     private int customerID;
 
     public enum AccountType{
@@ -21,8 +21,8 @@ public class Account {
         this.type = type;
         this.balance = balance;
         this.setInterestRate();
-        accountNumCounter++;
         this.accountNum = accountNumCounter;
+        accountNumCounter++;
 
 
     }

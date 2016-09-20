@@ -5,15 +5,15 @@ package blair.carina.ATM;
  */
 public class Customer {
     private int customerID;
-    private static int customerIDCounter;
+    private static int customerIDCounter = 1;
     private String name;
     private int PIN;
 
     public Customer(String name, int PIN){
         this.name = name;
         this.PIN = PIN;
-        customerIDCounter++;
         this.customerID = customerIDCounter;
+        customerIDCounter++;
     }
 
     public void setName(String name){
